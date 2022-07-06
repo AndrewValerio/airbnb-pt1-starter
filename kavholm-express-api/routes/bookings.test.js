@@ -87,5 +87,42 @@ describe("GET /bookings/listings", () => {
 })
 
 /************************************** POST bookings/listings/:listingId */
+ describe("POST bookings/listings/:listingId", () => {
+  test("Authed user can book a listing they don't own", async () => {
+     const listingId = testListingIds[0]
+     const 
+      newBooking =  {
+        startDate: "03-05-2021",
+        endDate: "03-07-2021",
+        guests: 1,
+      }
+
+     const res = await request(app)
+      .post(`/bookings`)
+      .set("authorization", `Bearer ${testTokens.jloToken}`)
+      .send({ newBooking })
+    expect(res.statusCode).toEqual(201)
+
+    const { booking } = res.body
+
+
+    expect(booking).toEqual({
+      id: expect.any(Number),
+      startDate: new Date("03-05-2021").toISOString(),
+      endDate: new Date("03-07-2021").toISOString(),
+      paymentMethod: "card",
+      guests: 1,
+      username: "jlo",
+      listingId: listingId,
+      userId: expect.any(Number),
+      createdAt: expect.any(String),
+    })
+})
+
+//   test("Throws Unauthorized error when user is unauthenticated", async () => {
+//     const res = await request(app).get(`/bookings/`)
+//     expect(res.statusCode).toEqual(401)
+//   })
+ })
 
 /************************************** GET bookings/listings/:listingId */
